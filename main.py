@@ -1,10 +1,5 @@
-# importing PIL
-from PIL import Image
-import numpy as np
 from noisy import noisy
-import numpy as np
 import matplotlib.pyplot as plt
-import pywt
 import pywt.data
 from auto_filter import AutoDwtFilter
 
