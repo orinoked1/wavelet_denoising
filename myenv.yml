@@ -1,0 +1,9 @@
+name: dwt_proj
+channels:
+  - defaults
+dependencies:
+  - pywavelets
+  - matplotlib
+  - scipy
+  - opencv
+prefix: C:\ProgramData\Anaconda3\envs\dwt_proj
