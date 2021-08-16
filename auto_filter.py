@@ -27,7 +27,7 @@ class AutoDwtFilter(object):
         max_level = np.floor(np.log2(image.shape[0] - 1)).astype('int')
         S_j = np.zeros((max_level, 3))
         for level in range(1, max_level + 1):
-            coeffs2 = pywt.wavedec2(image, 'bior1.3', level=level)
+            coeffs2 = pywt.wavedec2(image, self.wavelets, level=level)
             for i_component in range(3):
                 curr_w_j = coeffs2[1][i_component]
                 nominator = np.max(np.abs(curr_w_j))
@@ -39,7 +39,7 @@ class AutoDwtFilter(object):
         # prep work between eq 13 tp 14 calc S_r_L S_r_H
         S_r_L = np.zeros((3))
         S_r_H = np.zeros((3))
-        coeffs2 = pywt.wavedec2(image, 'bior1.3', level=k + 1)
+        coeffs2 = pywt.wavedec2(image, self.wavelets, level=k + 1)
         for i_component in range(3):
             w_k = coeffs2[k][i_component]
             w_kp1 = coeffs2[k + 1][i_component]
