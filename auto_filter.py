@@ -7,7 +7,7 @@ class AutoDwtFilter(object):
     def __init__(self):
         self.T_noise_only = 0.01 ** 2
         self.T_r = 0.2 ** 2
-        self.wavelets = 'bior1.3'
+        self.wavelets = 'db1'
 
     def __call__(self, image):
         # calc decomposition level
