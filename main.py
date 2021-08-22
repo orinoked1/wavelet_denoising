@@ -32,30 +32,44 @@ plt.title('approximation')
 
 # auto filter using the paper algo
 algo_filter = AutoDwtFilter()
-filtered_original, coeffs2_filt, k = algo_filter(original_noise)
+filtered_ours, coeffs2_filt, k = algo_filter(original_noise)
 # skimage filters
 # Estimate the average noise standard deviation across color channels.
 # Due to clipping in random_noise, the estimate will be a bit smaller than the
-im_bayes = denoise_wavelet(original_noise, method='BayesShrink', mode='soft',rescale_sigma=True)
+filtered_bayes = denoise_wavelet(original_noise, method='BayesShrink', mode='soft',rescale_sigma=True)
 sigma_est = estimate_sigma(original_noise, average_sigmas=True)
-im_visushrink = denoise_wavelet(original_noise,method='VisuShrink', mode='soft',sigma=sigma_est, rescale_sigma=True)
+filtered_visushrink = denoise_wavelet(original_noise,method='VisuShrink', mode='soft',sigma=sigma_est, rescale_sigma=True)
 
-
-fig, axs = plt.subplots(1, 3)
-axs[0].imshow(original, interpolation="nearest", cmap=plt.cm.gray)
-axs[0].set_title('original')
-axs[1].imshow(original_noise, interpolation="nearest", cmap=plt.cm.gray)
-axs[1].set_title('noisy')
-axs[2].imshow(filtered_original, interpolation="nearest", cmap=plt.cm.gray)
-axs[2].set_title('filtered')
-plt.show()
 
 
 # compare between the two images
-score, diff = compare_ssim(original, original_noise, full=True)
+score_noise, diff = compare_ssim(original, original_noise, full=True)
 diff = (diff * 255).astype("uint8")
-print("SSIM original-noise: {}".format(score))
+print("SSIM original-noise: {}".format(score_noise))
 
-score, diff = compare_ssim(original, filtered_original, full=True)
+score_ours, diff = compare_ssim(original, filtered_ours, full=True)
 diff = (diff * 255).astype("uint8")
-print("SSIM original-filtered: {}".format(score))
+print("SSIM original-filtered: {}".format(score_ours))
+
+score_visushrink, diff = compare_ssim(original, filtered_visushrink, full=True)
+diff = (diff * 255).astype("uint8")
+print("SSIM original- visushrink {}".format(score_visushrink))
+
+score_bayes, diff = compare_ssim(original, filtered_bayes, full=True)
+diff = (diff * 255).astype("uint8")
+print("SSIM original- bayes {}".format(score_bayes))
+
+fig, axs = plt.subplots(1, 5)
+axs[0].imshow(original, interpolation="nearest", cmap=plt.cm.gray)
+axs[0].set_title('original')
+axs[1].imshow(original_noise, interpolation="nearest", cmap=plt.cm.gray)
+axs[1].set_title('noisy score:' + str(score_noise))
+axs[2].imshow(filtered_ours, interpolation="nearest", cmap=plt.cm.gray)
+axs[2].set_title('filtered score:' + str(score_ours))
+axs[3].imshow(filtered_bayes, interpolation="nearest", cmap=plt.cm.gray)
+axs[3].set_title('bayes score:' + str(score_bayes))
+axs[4].imshow(filtered_visushrink, interpolation="nearest", cmap=plt.cm.gray)
+axs[4].set_title('visushrink score:' + str(score_visushrink))
+plt.show()
+
+
