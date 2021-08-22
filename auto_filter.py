@@ -5,8 +5,8 @@ import pywt.data
 
 class AutoDwtFilter(object):
     def __init__(self):
-        self.T_noise_only = 0.01 ** 2
-        self.T_r = 0.2 ** 2
+        self.T_noise_only =0.005 ** 2
+        self.T_r = 0.05 ** 2
         self.wavelets = 'db1'
 
     def __call__(self, image):
@@ -76,9 +76,9 @@ class AutoDwtFilter(object):
                 # eq. 9
                 sigma_j = np.std(curr_w_j)
                 # eq. 10
-                kappa_j_L_min = (mu_j - np.max(np.abs(curr_w_j_L))) / sigma_j
+                kappa_j_L_min = (mu_j - np.min(curr_w_j_L) + np.finfo(float).eps) / sigma_j
                 # eq. 11
-                kappa_j_H_min = (np.max(np.abs(curr_w_j_H)) - mu_j) / sigma_j
+                kappa_j_H_min = (np.max(np.abs(curr_w_j_H)) - mu_j + np.finfo(float).eps) / sigma_j
                 # eq. 14
                 S_j_L = np.max(np.abs(curr_w_j_L)) / np.sum(np.abs(curr_w_j_L))
                 # eq. 15
@@ -89,9 +89,9 @@ class AutoDwtFilter(object):
                 kappa_j_H = (S_r_H[i_component] - S_j_H) / S_r_H[i_component] * kappa_j_H_min
                 # eq. 6
                 if S_j[level - 1, i_component] < self.T_noise_only:
-                    lambda_j_L[level - 1, i_component] = mu_j - kappa_j_L_min* sigma_j
+                    lambda_j_L[level - 1, i_component] = mu_j - kappa_j_L_min * sigma_j
                 else:
-                    lambda_j_L[level - 1, i_component] = mu_j - kappa_j_L* sigma_j
+                    lambda_j_L[level - 1, i_component] = mu_j - kappa_j_L * sigma_j
 
                 # eq. 7
                 if S_j[level - 1, i_component] < self.T_noise_only:
