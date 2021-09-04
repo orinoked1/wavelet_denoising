@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import pywt.data
 from auto_filter import AutoDwtFilter
 from skimage.metrics import structural_similarity as compare_ssim
-
 from skimage.restoration import (denoise_wavelet, estimate_sigma)
 from skimage import data, img_as_float
 from skimage.util import random_noise
@@ -32,15 +31,36 @@ plt.title('approximation')
 T_noise_only = 1e-4
 T_r = 0.001
 # auto filter using the paper algo
-algo_filter = AutoDwtFilter(T_r=T_r,T_noise_only=T_noise_only)
-filtered_ours, coeffs2_filt, k = algo_filter(original_noise)
+algo_filter = AutoDwtFilter(T_r=T_r, T_noise_only=T_noise_only)
+filtered_ours, coeffs2_filt, k_opt = algo_filter(original_noise)
+
+# plot for different values of k
+k_vals = range(1, 9)
+scores_k_vals = []
+for k_itr in k_vals:
+    filtered_ours, coeffs2_filt, k = algo_filter(original_noise, k_itr)
+    score_ours, diff = compare_ssim(original, filtered_ours, full=True)
+    scores_k_vals.append(score_ours)
+    print("SSIM original-filtered: {}".format(score_ours), " k_val:", k_itr)
+    # plot the images for comparison
+    # plt.figure()
+    # plt.imshow(filtered_ours, interpolation="nearest", cmap=plt.cm.gray)
+    # plt.title('k_itr ' + str(k_itr))
+plt.figure()
+plt.scatter(k_vals, scores_k_vals, c='b', label='values')
+plt.scatter(k_opt, scores_k_vals[k_opt-1], c='r', label='opt')
+plt.xlabel('k values')
+plt.ylabel('SSIM score')
+plt.title('SSIM as a function of k')
+plt.legend()
+plt.grid()
+
 # skimage filters
 # Estimate the average noise standard deviation across color channels.
 # Due to clipping in random_noise, the estimate will be a bit smaller than the
 filtered_bayes = denoise_wavelet(original_noise, method='BayesShrink', mode='soft',rescale_sigma=True)
 sigma_est = estimate_sigma(original_noise, average_sigmas=True)
 filtered_visushrink = denoise_wavelet(original_noise,method='VisuShrink', mode='soft',sigma=sigma_est, rescale_sigma=True)
-
 
 
 # compare between the two images
@@ -72,5 +92,4 @@ axs[3].set_title('bayes score:' + str(score_bayes))
 axs[4].imshow(filtered_visushrink, interpolation="nearest", cmap=plt.cm.gray)
 axs[4].set_title('visushrink score:' + str(score_visushrink))
 plt.show()
-a=1
 

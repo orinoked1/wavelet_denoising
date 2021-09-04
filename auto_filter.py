@@ -9,10 +9,10 @@ class AutoDwtFilter(object):
         self.T_r = T_r
         self.wavelets = 'db1'
 
-    def __call__(self, image):
-        # calc decomposition level
+    def __call__(self, image, k=None):
         S_j = self.calc_S_j(image)
-        k = np.where(np.all(S_j < self.T_r, 1))[0][-1] + 1
+        if k is None:
+            k = np.where(np.all(S_j < self.T_r, 1))[0][-1] + 1
         # calc reference S_r_L & S_r_L (required for threshold)
         S_r_L, S_r_H = self.calc_S_r(image, k)
         # do decomposition
