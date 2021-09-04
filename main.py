@@ -29,9 +29,10 @@ coeffs2_arr, coeffs2_slices = pywt.coeffs_to_array(coeffs2)
 plt.figure()
 plt.imshow(coeffs2_arr, interpolation="nearest", cmap=plt.cm.gray)
 plt.title('approximation')
-
+T_noise_only = 1e-4
+T_r = 0.001
 # auto filter using the paper algo
-algo_filter = AutoDwtFilter()
+algo_filter = AutoDwtFilter(T_r=T_r,T_noise_only=T_noise_only)
 filtered_ours, coeffs2_filt, k = algo_filter(original_noise)
 # skimage filters
 # Estimate the average noise standard deviation across color channels.
@@ -71,5 +72,5 @@ axs[3].set_title('bayes score:' + str(score_bayes))
 axs[4].imshow(filtered_visushrink, interpolation="nearest", cmap=plt.cm.gray)
 axs[4].set_title('visushrink score:' + str(score_visushrink))
 plt.show()
-
+a=1
 

@@ -4,9 +4,9 @@ import pywt.data
 
 
 class AutoDwtFilter(object):
-    def __init__(self):
-        self.T_noise_only =0.005 ** 2
-        self.T_r = 0.05 ** 2
+    def __init__(self,T_r,T_noise_only):
+        self.T_noise_only = T_noise_only
+        self.T_r = T_r
         self.wavelets = 'db1'
 
     def __call__(self, image):
