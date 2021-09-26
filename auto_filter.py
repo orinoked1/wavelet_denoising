@@ -75,29 +75,34 @@ class AutoDwtFilter(object):
                 mu_j = np.mean(curr_w_j)
                 # eq. 9
                 sigma_j = np.std(curr_w_j)
-                # eq. 10
-                kappa_j_L_min = (mu_j - np.min(curr_w_j_L) + np.finfo(float).eps) / sigma_j
-                # eq. 11
-                kappa_j_H_min = (np.max(np.abs(curr_w_j_H)) - mu_j + np.finfo(float).eps) / sigma_j
-                # eq. 14
-                S_j_L = np.max(np.abs(curr_w_j_L)) / np.sum(np.abs(curr_w_j_L))
-                # eq. 15
-                S_j_H = np.max(np.abs(curr_w_j_H)) / np.sum(np.abs(curr_w_j_H))
-                # eq. 12
-                kappa_j_L = (S_r_L[i_component] - S_j_L) / S_r_L[i_component] * kappa_j_L_min
-                # eq. 13
-                kappa_j_H = (S_r_H[i_component] - S_j_H) / S_r_H[i_component] * kappa_j_H_min
-                # eq. 6
-                if S_j[level - 1, i_component] < self.T_noise_only:
-                    lambda_j_L[level - 1, i_component] = mu_j - kappa_j_L_min * sigma_j
+                if len(curr_w_j_L)==0:
+                    lambda_j_L[level - 1, i_component] = 0
                 else:
-                    lambda_j_L[level - 1, i_component] = mu_j - kappa_j_L * sigma_j
-
-                # eq. 7
-                if S_j[level - 1, i_component] < self.T_noise_only:
-                    lambda_j_H[level - 1, i_component] = mu_j + kappa_j_H_min * sigma_j
+                    # eq. 10
+                    kappa_j_L_min = (mu_j - np.min(curr_w_j_L) + np.finfo(float).eps) / sigma_j
+                    # eq. 14
+                    S_j_L = np.max(np.abs(curr_w_j_L)) / np.sum(np.abs(curr_w_j_L))
+                    # eq. 12
+                    kappa_j_L = (S_r_L[i_component] - S_j_L) / S_r_L[i_component] * kappa_j_L_min
+                    # eq. 6
+                    if S_j[level - 1, i_component] < self.T_noise_only:
+                        lambda_j_L[level - 1, i_component] = mu_j - kappa_j_L_min * sigma_j
+                    else:
+                        lambda_j_L[level - 1, i_component] = mu_j - kappa_j_L * sigma_j
+                if len(curr_w_j_H) == 0:
+                    lambda_j_H[level - 1, i_component] = 0
                 else:
-                    lambda_j_H[level - 1, i_component] = mu_j + kappa_j_H * sigma_j
+                    # eq. 11
+                    kappa_j_H_min = (np.max(np.abs(curr_w_j_H)) - mu_j + np.finfo(float).eps) / sigma_j
+                    # eq. 15
+                    S_j_H = np.max(np.abs(curr_w_j_H)) / np.sum(np.abs(curr_w_j_H))
+                    # eq. 13
+                    kappa_j_H = (S_r_H[i_component] - S_j_H) / S_r_H[i_component] * kappa_j_H_min
+                    # eq. 7
+                    if S_j[level - 1, i_component] < self.T_noise_only:
+                        lambda_j_H[level - 1, i_component] = mu_j + kappa_j_H_min * sigma_j
+                    else:
+                        lambda_j_H[level - 1, i_component] = mu_j + kappa_j_H * sigma_j
 
         return lambda_j_L, lambda_j_H
 

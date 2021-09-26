@@ -11,9 +11,10 @@ from skimage.metrics import peak_signal_noise_ratio
 # get data
 original = pywt.data.camera().astype('float')
 # add noise
-noise_params = {'mean': 0,
+noise_params = {'type':'gauss',
+                'mean': 0,
                 'sigma': 20}
-original_noise = noisy('gauss', original, noise_params)
+original_noise = noisy( original, noise_params)
 # plot original and noise
 fig, axs = plt.subplots(1, 2)
 axs[0].imshow(original, interpolation="nearest", cmap=plt.cm.gray)
@@ -38,8 +39,8 @@ filtered_ours, coeffs2_filt, k_opt = algo_filter(original_noise)
 k_vals = range(1, 9)
 scores_k_vals = []
 for k_itr in k_vals:
-    filtered_ours, coeffs2_filt, k = algo_filter(original_noise, k_itr)
-    score_ours, diff = compare_ssim(original, filtered_ours, full=True)
+    filtered_ours_k, coeffs2_filt, k = algo_filter(original_noise, k_itr)
+    score_ours, diff = compare_ssim(original, filtered_ours_k, full=True)
     scores_k_vals.append(score_ours)
     print("SSIM original-filtered: {}".format(score_ours), " k_val:", k_itr)
     # plot the images for comparison
@@ -49,9 +50,9 @@ for k_itr in k_vals:
 plt.figure()
 plt.scatter(k_vals, scores_k_vals, c='b', label='values')
 plt.scatter(k_opt, scores_k_vals[k_opt-1], c='r', label='opt')
-plt.xlabel('k values')
+plt.xlabel('decomposition level')
 plt.ylabel('SSIM score')
-plt.title('SSIM as a function of k')
+plt.title('SSIM as a function of decomposition level')
 plt.legend()
 plt.grid()
 

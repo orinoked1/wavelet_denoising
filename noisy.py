@@ -2,7 +2,7 @@
 
 import numpy as np
 
-def noisy(noise_typ,image,params):
+def noisy(image,params):
     # Parameters
     # ----------
     # image : ndarray
@@ -15,7 +15,7 @@ def noisy(noise_typ,image,params):
     #     's&p'       Replaces random pixels with 0 or 1.
     #     'speckle'   Multiplicative noise using out = image + n*image,where
     #                 n is uniform noise with specified mean & variance.
-
+    noise_typ = params['type']
     if noise_typ == "gauss":
       row,col= image.shape
       mean = params['mean']
@@ -24,28 +24,31 @@ def noisy(noise_typ,image,params):
       gauss = np.random.normal(mean,sigma,(row,col))
       gauss = gauss.reshape(row,col)
       noisy = image + gauss
+      noisy = noisy.round()
+      noisy[noisy<0]=0
+      noisy[noisy >255] = 255
       return noisy
     elif noise_typ == "s&p":
       s_vs_p = params['s_vs_p']
       amount = params['amount']
       out = np.copy(image)
+      pixel_idxs = np.random.choice(np.arange(image.size-1), int(amount * image.size), replace=False)
       # Salt mode
-      num_salt = np.ceil(amount * image.size * s_vs_p)
-      coords = [np.random.randint(0, i - 1, int(num_salt))
-              for i in image.shape]
-      out[coords] = 1
-
+      coords = pixel_idxs[:int(len(pixel_idxs)*s_vs_p)]
+      out[np.unravel_index(coords, image.shape)] = 255
       # Pepper mode
-      num_pepper = np.ceil(amount* image.size * (1. - s_vs_p))
-      coords = [np.random.randint(0, i - 1, int(num_pepper))
-              for i in image.shape]
-      out[coords] = 0
+      coords = pixel_idxs[int(len(pixel_idxs) * s_vs_p):]
+      out[np.unravel_index(coords, image.shape)] = 0
       return out
     elif noise_typ == "poisson":
       vals = len(np.unique(image))
       vals = 2 ** np.ceil(np.log2(vals))
       noisy = np.random.poisson(image * vals) / float(vals)
+      noisy = noisy.round()
+      noisy[noisy<0]=0
+      noisy[noisy >255] = 255
       return noisy
+
     elif noise_typ =="speckle":
 
       row,col = image.shape
